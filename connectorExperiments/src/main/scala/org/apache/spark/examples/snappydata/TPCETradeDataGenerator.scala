@@ -1,46 +1,48 @@
+/*
+ * Copyright (c) 2016 SnappyData, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License. See accompanying
+ * LICENSE file.
+ */
 package org.apache.spark.examples.snappydata
 
 import java.sql.{Date, Timestamp}
 import java.text.SimpleDateFormat
 import java.util.{Calendar, GregorianCalendar}
 
-import org.apache.spark.sql.SnappyContext
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.Decimal
-import org.apache.spark.{SparkConf, SparkContext}
 
-/**
-  * Created by kishor on 21/10/16.
-  */
 object TPCETradeDataGenerator {
 
   def main (args: Array[String]): Unit = {
-    val conf = new SparkConf()
-      .setAppName("Datagenerator")
-      .setMaster("local[1]")
-      //.setMaster("snappydata://localhost:10334")
-      .set("jobserver.enabled", "false")
-    val sc = new SparkContext(conf)
-    val snc =
-      SnappyContext(sc)
+    val spark: SparkSession = SparkSession
+      .builder
+      .appName("DataGenerator")
+      .getOrCreate
 
+    val datasize =  args(0).toLong
+    // calculate number of rows from data sizes.
+    val quoteSize:Long = datasize * 16320000
+    val tradeSize:Long = datasize * 2400000
 
-    val quoteSize:Long = args(0).toLong
-    val tradeSize:Long =  args(1).toLong
-    val format= args(2)
-    val path = args(3)
+    val path = args(1)
 
-//    val quoteSize = 6800000
-//    val tradeSize = 1000000
-
-//    val quoteSize = 340
-//    val tradeSize = 50
+    val provider = if (args.size == 2) "csv" else args(2)
 
     val EXCHANGES: Array[String] = Array("NYSE", "NASDAQ", "AMEX", "TSE",
       "LON", "BSE", "BER", "EPA", "TYO")
-    /*
-    val SYMBOLS: Array[String] = Array("IBM", "YHOO", "GOOG", "MSFT", "AOL",
-      "APPL", "ORCL", "SAP", "DELL", "RHAT", "NOVL", "HP")
-    */
+
     val ALL_SYMBOLS: Array[String] = {
       val syms = new Array[String](400)
       for (i <- 0 until 10) {
@@ -54,11 +56,10 @@ object TPCETradeDataGenerator {
       }
       syms
     }
-    val SYMBOLS: Array[String] = ALL_SYMBOLS.take(100)
     val numDays = 1
-    import snc.implicits._
+    import spark.implicits._
 
-    val quoteDF = snc.range(quoteSize).mapPartitions { itr =>
+    val quoteDF = spark.range(quoteSize).mapPartitions { itr =>
       val rnd = new java.util.Random()
       val syms = ALL_SYMBOLS
       val numSyms = syms.length
@@ -88,15 +89,12 @@ object TPCETradeDataGenerator {
         cal.set(Calendar.MILLISECOND, rnd.nextInt(1000))
         val time = new Timestamp(cal.getTimeInMillis)
         val bid=rnd.nextDouble() * 100000
-        //Quote(sym, ex, bid, new SimpleDateFormat("HH:mm:ss.SSS").format(time).toString, new SimpleDateFormat("yyyy-mm-dd").format(date).toString)
         Quote(sym, ex, bid, new SimpleDateFormat("HH:mm:ss.SSS").format(time).toString, date.toString)
       }
     }
-    //quoteDF.write.format("com.databricks.spark.csv").option("dateFormat", "yyyy-MM-dd H:m:s").save("/home/kishor/quote.csv")
-    //quoteDF.write.format("com.databricks.spark.csv").save("/home/kishor/snappy/TPCETrade/quote_Small.csv")
-    quoteDF.write.format(s"$format").save(s"$path/quote_Small")
+    quoteDF.write.format(s"$provider").save(s"$path/quotes")
 
-    val tradeDF = snc.range(tradeSize).mapPartitions { itr =>
+    val tradeDF = spark.range(tradeSize).mapPartitions { itr =>
       val rnd = new java.util.Random()
       val syms = ALL_SYMBOLS
       val numSyms = syms.length
@@ -128,17 +126,10 @@ object TPCETradeDataGenerator {
         val time = new Timestamp(cal.getTimeInMillis)
         val dec = Decimal(rnd.nextInt(100000000), 10, 4).toString
         val size=rnd.nextDouble() * 1000
-        //Trade(sym, ex, dec, new SimpleDateFormat("HH:mm:ss.SSS").format(time).toString, new SimpleDateFormat("yyyy-mm-dd").format(date).toString, size)
         Trade(sym, ex, dec, new SimpleDateFormat("HH:mm:ss.SSS").format(time).toString, date.toString, size)
       }
     }
-    //tradeDF.write.format("com.databricks.spark.csv").save("/home/kishor/snappy/TPCETrade/trade_Small.csv")
-    tradeDF.write.format(s"$format").save(s"$path/trade_Small")
-
-    val sDF = snc.createDataset(SYMBOLS)
-    //sDF.write.format("com.databricks.spark.csv").save("/home/kishor/snappy/TPCETrade/symbol.csv")
-    sDF.write.format(s"$format").save(s"$path/symbol")
-
+    tradeDF.write.format(s"$provider").save(s"$path/trades")
   }
 
   case class Quote(sym: String, ex: String, bid: Double, time: String,

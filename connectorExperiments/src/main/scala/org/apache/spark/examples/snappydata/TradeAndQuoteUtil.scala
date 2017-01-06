@@ -27,7 +27,7 @@ object TradeAndQuoteUtil {
   val quoteTable = "QUOTES"
   val stagingTradeTable = "STAGING_TRADES"
   val stagingQuoteTable = "STAGING_QUOTES"
-  val symbolsTable = "SYMBOLS"
+  val symbolsTable = "S"
   val stagingSymbolsTable = "STAGING_SYMBOLS"
 
   def createTables(snc: SnappySession,
@@ -40,6 +40,8 @@ object TradeAndQuoteUtil {
     snc.dropTable(quoteTable, ifExists = true)
     snc.dropTable(stagingTradeTable, ifExists = true)
     snc.dropTable(stagingQuoteTable, ifExists = true)
+    snc.dropTable(symbolsTable, ifExists = true)
+    snc.dropTable(stagingSymbolsTable, ifExists = true)
 
     // Create a DF from the parquet data file and make it a table
     val tradeDF = snc.catalog.createExternalTable(stagingTradeTable, "parquet",
@@ -65,6 +67,7 @@ object TradeAndQuoteUtil {
     val t2 = System.currentTimeMillis()
     quoteDF.write.mode(SaveMode.Append).saveAsTable(quoteTable)
     val t3 = System.currentTimeMillis()
+    symbolDF.write.mode(SaveMode.Append).saveAsTable(symbolsTable)
 
     val printString = s"Load time- Trades: ${(t2 - t1)} millis. Quotes: ${t3 - t2} millis."
 
@@ -86,11 +89,11 @@ object TradeAndQuoteUtil {
 
     val queries = Array(
       "select quotes.sym, last(bid) from quotes join S " +
-        s"on (quotes.sym = S.sym) where date='$dateString' group by quotes.sym",
+        s"on (quotes.sym = S.value) where date='$dateString' group by quotes.sym",
       "select trades.sym, ex, last(price) from trades join S " +
-        s"on (trades.sym = S.sym) where date='$dateString' group by trades.sym, ex",
+        s"on (trades.sym = S.value) where date='$dateString' group by trades.sym, ex",
       "select trades.sym, hour(time), avg(size) from trades join S " +
-        s"on (trades.sym = S.sym) where date='$dateString' group by trades.sym, hour(time)"
+        s"on (trades.sym = S.value) where date='$dateString' group by trades.sym, hour(time)"
     )
 
     val printString = queries.zipWithIndex.map {

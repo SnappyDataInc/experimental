@@ -18,7 +18,7 @@ package org.apache.spark.examples.snappydata
 
 import org.apache.spark.sql.{SnappySession, SparkSession}
 
-object QueryTradeAndJobApp {
+object QueryTradeAndQuoteApp {
   def main(args: Array[String]): Unit = {
     val spark: SparkSession = SparkSession
       .builder

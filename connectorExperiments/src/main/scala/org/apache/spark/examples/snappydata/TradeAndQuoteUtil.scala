@@ -98,10 +98,16 @@ object TradeAndQuoteUtil {
 
     val printString = queries.zipWithIndex.map {
       case (q: String, index: Int) =>
-        val t1 = System.currentTimeMillis()
+        // ignore first run as warmup run.
         snc.sql(q).collect()
+
+        // report average of five runs.
+        val t1 = System.currentTimeMillis()
+        for(i<- 1 to 5){
+          snc.sql(q).collect()
+        }
         val t2 = System.currentTimeMillis()
-        s"Query $index- Time taken: ${t2-t1}"
+        s"Query $index- Time taken: ${(t2-t1)/5}"
     }.mkString("\n")
 
     pw match {

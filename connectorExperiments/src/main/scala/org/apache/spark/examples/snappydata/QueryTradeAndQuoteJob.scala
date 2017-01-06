@@ -41,7 +41,6 @@ object QueryTradeAndQuoteJob extends SnappySQLJob {
   }
 
   override def isValidJob(snc: SnappySession, config: Config): SnappyJobValidation = {
-
     SnappyJobValid()
   }
 }

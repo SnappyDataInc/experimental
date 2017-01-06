@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.{Calendar, GregorianCalendar}
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.types.Decimal
+import org.apache.spark.sql.types.{Decimal, StringType, StructField, StructType}
 
 object TPCETradeDataGenerator {
 
@@ -56,8 +56,10 @@ object TPCETradeDataGenerator {
       }
       syms
     }
+    val SYMBOLS: Array[String] = ALL_SYMBOLS.take(100)
     val numDays = 1
     import spark.implicits._
+    val sDF = spark.createDataset(SYMBOLS)
 
     val quoteDF = spark.range(quoteSize).mapPartitions { itr =>
       val rnd = new java.util.Random()
@@ -130,6 +132,7 @@ object TPCETradeDataGenerator {
       }
     }
     tradeDF.write.format(s"$provider").save(s"$path/trades")
+    sDF.write.format(s"$provider").save(s"$path/symbols")
   }
 
   case class Quote(sym: String, ex: String, bid: Double, time: String,

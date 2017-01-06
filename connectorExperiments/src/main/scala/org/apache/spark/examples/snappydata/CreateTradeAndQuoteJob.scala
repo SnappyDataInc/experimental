@@ -26,7 +26,7 @@ import scala.util.{Failure, Success, Try}
 object CreateTradeAndQuoteJob extends SnappySQLJob {
   var provider: String = _
   var tradePath: String = _
-  var quotePath: String = _
+  var path: String = _
 
   override def runSnappyJob(snc: SnappySession, jobConfig: Config): Any = {
     def getCurrentDirectory = new java.io.File(".").getCanonicalPath
@@ -35,8 +35,7 @@ object CreateTradeAndQuoteJob extends SnappySQLJob {
     Try {
       TradeAndQuoteUtil.createTables(snc,
         provider: String,
-        tradePath: String,
-        quotePath: String,
+        path: String,
         Some(pw))
     } match {
       case Success(v) => pw.close()
@@ -49,10 +48,9 @@ object CreateTradeAndQuoteJob extends SnappySQLJob {
 
   override def isValidJob(snc: SnappySession, config: Config): SnappyJobValidation = {
     provider = if (config.hasPath("provider")) config.getString("provider") else "column";
-    tradePath = if (config.hasPath("provider")) config.getString("tradePath") else "";
-    quotePath = if (config.hasPath("provider")) config.getString("quotePath") else "";
+    path = if (config.hasPath("path")) config.getString("path") else "";
 
-    if (!(new File(tradePath)).exists() || !(new File(quotePath)).exists() ) {
+    if (!(new File(path)).exists()) {
       return new SnappyJobInvalid("Incorrect path for data files.")
     }
     SnappyJobValid()

@@ -27,11 +27,12 @@ object TradeAndQuoteUtil {
   val quoteTable = "QUOTES"
   val stagingTradeTable = "STAGING_TRADES"
   val stagingQuoteTable = "STAGING_QUOTES"
+  val symbolsTable = "SYMBOLS"
+  val stagingSymbolsTable = "STAGING_SYMBOLS"
 
   def createTables(snc: SnappySession,
                    provider: String,
-                   tradePath: String,
-                   quotePath: String,
+                   path: String,
                    pw: Option[PrintWriter] = None): Any = {
 
     // Drop tables if already exists
@@ -42,15 +43,21 @@ object TradeAndQuoteUtil {
 
     // Create a DF from the parquet data file and make it a table
     val tradeDF = snc.catalog.createExternalTable(stagingTradeTable, "parquet",
-      Map("path" -> tradePath))
+      Map("path" -> s"$path/trades"))
     val quoteDF = snc.catalog.createExternalTable(stagingQuoteTable, "parquet",
-      Map("path" -> quotePath))
+      Map("path" -> s"$path/quotes"))
+    val symbolDF = snc.catalog.createExternalTable(stagingSymbolsTable, "parquet",
+      Map("path" -> s"$path/symbols"))
 
     // Create tables in Snappy
     snc.createTable(tradeTable, provider,
-      tradeDF.schema, Map.empty[String, String])
+      tradeDF.schema, Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
     snc.createTable(quoteTable, provider,
-      quoteDF.schema, Map.empty[String, String])
+      quoteDF.schema, Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
+
+    // symbols will be a replicated table, always
+    snc.createTable(symbolsTable, "row",
+      symbolDF.schema, Map("persistent" -> "SYNCHRONOUS"))
 
     // Load the tables and note the time taken
     val t1 = System.currentTimeMillis()
@@ -66,9 +73,8 @@ object TradeAndQuoteUtil {
       case _ => System.out.println(printString)
     }
   }
-
+  private val dateString = "2016-06-06"
   def queryTables(snc: SnappySession,
-                  dateString: String,
                   pw: Option[PrintWriter] = None): Unit = {
     // scala example: Is it needed?
     //    val tradeDF: DataFrame = snc.table(tradeTable)
@@ -79,12 +85,12 @@ object TradeAndQuoteUtil {
     //      agg("bid" -> "max")
 
     val queries = Array(
-      "select quote.sym, last(bid) from quote join S " +
-        s"on (quote.sym = S.sym) where date='$dateString' group by quote.sym",
-      "select trade.sym, ex, last(price) from trade join S " +
-        s"on (trade.sym = S.sym) where date='$dateString' group by trade.sym, ex",
-      "select trade.sym, hour(time), avg(size) from trade join S " +
-        s"on (trade.sym = S.sym) where date='$dateString' group by trade.sym, hour(time)"
+      "select quotes.sym, last(bid) from quotes join S " +
+        s"on (quotes.sym = S.sym) where date='$dateString' group by quotes.sym",
+      "select trades.sym, ex, last(price) from trades join S " +
+        s"on (trades.sym = S.sym) where date='$dateString' group by trades.sym, ex",
+      "select trades.sym, hour(time), avg(size) from trades join S " +
+        s"on (trades.sym = S.sym) where date='$dateString' group by trades.sym, hour(time)"
     )
 
     val printString = queries.zipWithIndex.map {

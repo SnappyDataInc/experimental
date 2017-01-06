@@ -16,8 +16,22 @@
  */
 package org.apache.spark.examples.snappydata
 
+import org.apache.spark.sql.{SnappySession, SparkSession}
+
+import scala.util.{Failure, Success, Try}
+
 object CreateTradeAndQuoteApp {
   def main (args: Array[String]): Unit = {
+    val spark: SparkSession = SparkSession
+      .builder
+      .appName("CreateTradeAndQuoteApp")
+      .getOrCreate
+
+    val snSession = new SnappySession(spark.sparkContext)
+
+    TradeAndQuoteUtil.createTables(snSession,
+        provider = args(0),
+        path = args(1))
 
   }
 }

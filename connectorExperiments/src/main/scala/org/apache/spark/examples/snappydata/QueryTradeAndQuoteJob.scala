@@ -31,9 +31,7 @@ object QueryTradeAndQuoteJob extends SnappySQLJob {
     val pw = new PrintWriter("QueryTradeAndQuoteJob.out")
 
     Try {
-      TradeAndQuoteUtil.queryTables(snc,
-        dateString: String,
-        Some(pw))
+      TradeAndQuoteUtil.queryTables(snc, Some(pw))
     } match {
       case Success(v) => pw.close()
         s"See ${getCurrentDirectory}/QueryTradeAndQuoteJob.out"
@@ -43,11 +41,7 @@ object QueryTradeAndQuoteJob extends SnappySQLJob {
   }
 
   override def isValidJob(snc: SnappySession, config: Config): SnappyJobValidation = {
-    dateString = if (config.hasPath("dateString")) config.getString("dateString") else "";
 
-    if (dateString == "") {
-      return new SnappyJobInvalid("Date for queries not specified.")
-    }
     SnappyJobValid()
   }
 }

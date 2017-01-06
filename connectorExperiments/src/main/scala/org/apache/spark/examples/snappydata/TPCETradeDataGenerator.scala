@@ -38,7 +38,7 @@ object TPCETradeDataGenerator {
 
     val path = args(1)
 
-    val provider = if (args.size == 2) "csv" else args(2)
+    val provider = if (args.size == 2) "parquet" else args(2)
 
     val EXCHANGES: Array[String] = Array("NYSE", "NASDAQ", "AMEX", "TSE",
       "LON", "BSE", "BER", "EPA", "TYO")

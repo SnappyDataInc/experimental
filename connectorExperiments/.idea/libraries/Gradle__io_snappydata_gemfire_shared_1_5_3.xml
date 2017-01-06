@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.snappydata:gemfire-shared:1.5.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/gemfire-shared/1.5.3/1a1426815eaea86b825383879a4f4b57be2cf162/gemfire-shared-1.5.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/gemfire-shared/1.5.3/e74d3fd4fe1a5c90027d5d6cffeea46010aa1f0b/gemfire-shared-1.5.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

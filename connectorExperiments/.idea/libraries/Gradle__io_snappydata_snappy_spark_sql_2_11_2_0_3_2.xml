@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.snappydata:snappy-spark-sql_2.11:2.0.3-2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappy-spark-sql_2.11/2.0.3-2/537f593e1281280da6741b0dd88db7fa39212eec/snappy-spark-sql_2.11-2.0.3-2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappy-spark-sql_2.11/2.0.3-2/d4f63922f9b61dc25332e856a2b91d46fb059038/snappy-spark-sql_2.11-2.0.3-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: net.sf.supercsv:super-csv:2.2.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.sf.supercsv/super-csv/2.2.0/610e18fff0e7bd6cd072310f0d73fc982ffb6834/super-csv-2.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.sf.supercsv/super-csv/2.2.0/dcd4536ca34679e5f8cd26cc8bddeb7ca31244c6/super-csv-2.2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

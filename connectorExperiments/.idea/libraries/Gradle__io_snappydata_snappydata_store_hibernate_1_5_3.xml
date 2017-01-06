@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.snappydata:snappydata-store-hibernate:1.5.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappydata-store-hibernate/1.5.3/355198520f5ae4852267141717025f4b11ec81b0/snappydata-store-hibernate-1.5.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappydata-store-hibernate/1.5.3/87ae3be0634bbcc9bbcb1913be8d9f6242e533f8/snappydata-store-hibernate-1.5.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.hadoop:hadoop-yarn-server-web-proxy:2.7.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.hadoop/hadoop-yarn-server-web-proxy/2.7.3/27a82c99c3c712403e1384746e94e20edd6c134c/hadoop-yarn-server-web-proxy-2.7.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.hadoop/hadoop-yarn-server-web-proxy/2.7.3/95b04b275f4c18039818dce8d08974607ccbc72e/hadoop-yarn-server-web-proxy-2.7.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.hbase:hbase-prefix-tree:0.98.17-hadoop2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.hbase/hbase-prefix-tree/0.98.17-hadoop2/b98aaf118c3dadb759bf044b04cfa2deaec3b142/hbase-prefix-tree-0.98.17-hadoop2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.hbase/hbase-prefix-tree/0.98.17-hadoop2/3458ea0f69734676df1bc8f280cd1504ca1c2d45/hbase-prefix-tree-0.98.17-hadoop2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

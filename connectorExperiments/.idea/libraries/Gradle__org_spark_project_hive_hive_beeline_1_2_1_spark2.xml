@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.spark-project.hive:hive-beeline:1.2.1.spark2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spark-project.hive/hive-beeline/1.2.1.spark2/bdec9538e1d4b2825a90d194a901204dbbf72e74/hive-beeline-1.2.1.spark2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spark-project.hive/hive-beeline/1.2.1.spark2/c522086729d06b9fa5dd6eab9f13c016dada6be7/hive-beeline-1.2.1.spark2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

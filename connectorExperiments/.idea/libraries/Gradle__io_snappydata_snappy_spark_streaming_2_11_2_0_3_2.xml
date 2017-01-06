@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.snappydata:snappy-spark-streaming_2.11:2.0.3-2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappy-spark-streaming_2.11/2.0.3-2/13876a5d9b776189ec4c3d52a05fa4e4a509768d/snappy-spark-streaming_2.11-2.0.3-2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappy-spark-streaming_2.11/2.0.3-2/f76139477245749a33cbf9292441d1600fbba777/snappy-spark-streaming_2.11-2.0.3-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

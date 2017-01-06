@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.snappydata:spark-jobserver_2.11:0.6.3-2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/spark-jobserver_2.11/0.6.3-2/c7eb748ca5ed38e7308553b61acc142ef5d4b4df/spark-jobserver_2.11-0.6.3-2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/spark-jobserver_2.11/0.6.3-2/9cfb573e54ee8d1a73762ec50a58a93e5571e512/spark-jobserver_2.11-0.6.3-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

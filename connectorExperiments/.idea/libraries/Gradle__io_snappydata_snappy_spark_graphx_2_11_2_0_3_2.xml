@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.snappydata:snappy-spark-graphx_2.11:2.0.3-2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappy-spark-graphx_2.11/2.0.3-2/26ec70cc467ca077c7e3d7b1582aaad3702fde6a/snappy-spark-graphx_2.11-2.0.3-2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappy-spark-graphx_2.11/2.0.3-2/606d3ab4546efed157b32852d1f2432444a7e755/snappy-spark-graphx_2.11-2.0.3-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

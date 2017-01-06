@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.snappydata:gemfire-joptsimple:1.5.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/gemfire-joptsimple/1.5.3/6fb5bc5d20f84fcd50397bce75b2e02fe0f3ba78/gemfire-joptsimple-1.5.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/gemfire-joptsimple/1.5.3/65c14cb820cbf756ae9603b490f5bf044cf9d80b/gemfire-joptsimple-1.5.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

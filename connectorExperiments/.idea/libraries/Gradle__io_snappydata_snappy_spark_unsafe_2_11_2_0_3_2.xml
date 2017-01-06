@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.snappydata:snappy-spark-unsafe_2.11:2.0.3-2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappy-spark-unsafe_2.11/2.0.3-2/e847fe71bb7b91f8d347bb4dca88aec830afb290/snappy-spark-unsafe_2.11-2.0.3-2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.snappydata/snappy-spark-unsafe_2.11/2.0.3-2/358d5366a19ba594984669c723717e273bf7f3aa/snappy-spark-unsafe_2.11-2.0.3-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

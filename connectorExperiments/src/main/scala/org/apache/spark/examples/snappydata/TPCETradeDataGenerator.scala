@@ -61,7 +61,7 @@ object TPCETradeDataGenerator {
     import spark.implicits._
     val sDF = spark.createDataset(SYMBOLS)
 
-    val quoteDF = spark.range(quoteSize).mapPartitions { itr =>
+    val quoteDF = spark.range(0,quoteSize,1,200).mapPartitions { itr =>
       val rnd = new java.util.Random()
       val syms = ALL_SYMBOLS
       val numSyms = syms.length
@@ -96,7 +96,7 @@ object TPCETradeDataGenerator {
     }
     quoteDF.write.format(s"$provider").save(s"$path/quotes")
 
-    val tradeDF = spark.range(tradeSize).mapPartitions { itr =>
+    val tradeDF = spark.range(0,tradeSize,1,200).mapPartitions { itr =>
       val rnd = new java.util.Random()
       val syms = ALL_SYMBOLS
       val numSyms = syms.length

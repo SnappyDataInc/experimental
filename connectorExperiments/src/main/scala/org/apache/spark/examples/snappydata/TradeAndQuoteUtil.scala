@@ -19,6 +19,8 @@ package org.apache.spark.examples.snappydata
 import java.io.PrintWriter
 
 import org.apache.spark.sql._
+import org.apache.spark.sql.collection.Utils
+import org.apache.spark.sql.types.{Decimal, StringType, StructField, StructType}
 
 
 object TradeAndQuoteUtil {
@@ -53,13 +55,14 @@ object TradeAndQuoteUtil {
 
     // Create tables in Snappy
     snc.createTable(tradeTable, provider,
-      tradeDF.schema, Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
+      newSchema(tradeDF.schema), Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
     snc.createTable(quoteTable, provider,
-      quoteDF.schema, Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
+      newSchema(quoteDF.schema), Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
+
 
     // symbols will be a replicated table, always
     snc.createTable(symbolsTable, "row",
-      symbolDF.schema, Map("persistent" -> "SYNCHRONOUS"))
+      newSchema(symbolDF.schema), Map("persistent" -> "SYNCHRONOUS"))
 
     // Load the tables and note the time taken
     val t1 = System.currentTimeMillis()
@@ -115,4 +118,14 @@ object TradeAndQuoteUtil {
       case _ => System.out.println(printString)
     }
   }
+
+  def newSchema(schema: StructType): StructType = {
+    new StructType(schema.map { a => a match {
+      case b if b.name.contains("comment") && b.dataType.equals(StringType) =>  new StructField(b.name, b.dataType,
+        false, Utils.varcharMetadata(400))
+      case c if c.dataType.equals(StringType) =>  new StructField(c.name, c.dataType, false, Utils.varcharMetadata(30))
+      case _ => a
+    } }.toArray)
+  }
+
 }

@@ -53,16 +53,27 @@ object TradeAndQuoteUtil {
     val symbolDF = snc.catalog.createExternalTable(stagingSymbolsTable, "parquet",
       Map("path" -> s"$path/symbols"))
 
+    // Convert string types to varchar for row tables.
+    val tradeSchema = if (provider == "row")
+      convertStringToVarchar(tradeDF.schema)
+    else
+      tradeDF.schema
+
+    val quoteSchema = if (provider == "row")
+      convertStringToVarchar(quoteDF.schema)
+    else
+      quoteDF.schema
+
     // Create tables in Snappy
     snc.createTable(tradeTable, provider,
-      newSchema(tradeDF.schema), Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
+      tradeSchema, Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
     snc.createTable(quoteTable, provider,
-      newSchema(quoteDF.schema), Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
+      quoteSchema, Map("PARTITION_BY" -> "sym", "persistent" -> "SYNCHRONOUS"))
 
 
     // symbols will be a replicated table, always
     snc.createTable(symbolsTable, "row",
-      newSchema(symbolDF.schema), Map("persistent" -> "SYNCHRONOUS"))
+      convertStringToVarchar(symbolDF.schema), Map("persistent" -> "SYNCHRONOUS"))
 
     // Load the tables and note the time taken
     val t1 = System.currentTimeMillis()
@@ -119,11 +130,13 @@ object TradeAndQuoteUtil {
     }
   }
 
-  def newSchema(schema: StructType): StructType = {
+  def convertStringToVarchar(schema: StructType): StructType = {
     new StructType(schema.map { a => a match {
-      case b if b.name.contains("comment") && b.dataType.equals(StringType) =>  new StructField(b.name, b.dataType,
+      case b if b.name.contains("comment") && b.dataType.equals(StringType) =>
+        new StructField(b.name, b.dataType,
         false, Utils.varcharMetadata(400))
-      case c if c.dataType.equals(StringType) =>  new StructField(c.name, c.dataType, false, Utils.varcharMetadata(30))
+      case c if c.dataType.equals(StringType) =>
+        new StructField(c.name, c.dataType, false, Utils.varcharMetadata(30))
       case _ => a
     } }.toArray)
   }

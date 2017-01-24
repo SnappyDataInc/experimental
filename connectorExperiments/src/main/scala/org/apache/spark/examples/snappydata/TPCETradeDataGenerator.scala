@@ -33,20 +33,17 @@ object TPCETradeDataGenerator {
       .getOrCreate
 
     val datasize =  args(0).toLong
-    // calculate number of rows from data sizes.
 
     val path = args(1)
 
-    var quoteSize:Long = datasize * 16320000
-    var tradeSize:Long = datasize * 2400000
+    // var quoteSize:Long = datasize * 16320000
+    // var tradeSize:Long = datasize * 2400000
 
-    val schemaType = args(2)
-    if(schemaType.equals("Wider")){
-      quoteSize = datasize * 791465
-      tradeSize = datasize * 116391
-    }
+    // calculate number of rows from data sizes.
+    val quoteSize = datasize * 791465
+    val tradeSize = datasize * 116391
 
-    val provider = if (args.size == 3) "parquet" else args(3)
+    val provider = if (args.size == 2) "parquet" else args(2)
 
     val EXCHANGES: Array[String] = Array("NYSE", "NASDAQ", "AMEX", "TSE",
       "LON", "BSE", "BER", "EPA", "TYO")
@@ -99,7 +96,6 @@ object TPCETradeDataGenerator {
         cal.set(Calendar.MILLISECOND, rnd.nextInt(1000))
         val time = new Timestamp(cal.getTimeInMillis)
         val bid=rnd.nextDouble() * 100000
-        //if(schemaType.equals("Wider"))
           Quote(sym, ex, bid, new SimpleDateFormat("HH:mm:ss.SSS").format(time).toString, date.toString,
             s"Comment1 : Quote Table : $sym + $ex + $time + $date",
             s"Comment2 : Quote Table : $sym + $ex + $time + $date",
@@ -116,8 +112,6 @@ object TPCETradeDataGenerator {
             s"Comment13 : Quote Table : $sym + $ex + $time + $date",
             s"Comment14 : Quote Table : $sym + $ex + $time + $date",
             s"Comment15 : Quote Table : $sym + $ex +  $time + $date")
-//        else
-//          new Quote(sym, ex, bid, new SimpleDateFormat("HH:mm:ss.SSS").format(time).toString, date.toString)
       }
     }
     quoteDF.write.format(s"$provider").save(s"$path/quotes")
@@ -154,7 +148,6 @@ object TPCETradeDataGenerator {
         val time = new Timestamp(cal.getTimeInMillis)
         val dec = Decimal(rnd.nextInt(100000000), 10, 4).toString
         val size=rnd.nextDouble() * 1000
-        //if(schemaType.equals("Wider"))
           Trade(sym, ex, dec, new SimpleDateFormat("HH:mm:ss.SSS").format(time).toString, date.toString, size,
             s"Comment1 : Trade Table : $sym + $ex + $dec + $time + $date + $size",
             s"Comment2 : Trade Table : $sym + $ex + $dec + $time + $date + $size",
@@ -165,9 +158,6 @@ object TPCETradeDataGenerator {
             s"Comment7 : Trade Table : $sym + $ex + $dec + $time + $date + $size",
             s"Comment8 : Trade Table : $sym + $ex + $dec + $time + $date + $size",
             s"Comment9 : Trade Table : $sym + $ex + $dec + $time + $date + $size")
-//        else
-//          new Trade(sym, ex, dec, new SimpleDateFormat("HH:mm:ss.SSS").format(time).toString, date.toString, size)
-
       }
     }
     tradeDF.write.format(s"$provider").save(s"$path/trades")
@@ -177,21 +167,10 @@ object TPCETradeDataGenerator {
   case class Quote(sym: String, ex: String, bid: Double, time: String,
                    date: String, comment1:String, comment2:String, comment3:String, comment4:String, comment5:String,
                    comment6:String, comment7:String, comment8:String, comment9:String, comment10:String,
-                   comment11:String, comment12:String,comment13:String, comment14:String, comment15:String) {
-
-//    def this(sym: String, ex: String, bid: Double, time: String, date: String){
-//      this(sym, ex, bid, time, date,)
-//    }
-  }
+                   comment11:String, comment12:String,comment13:String, comment14:String, comment15:String)
 
   case class Trade(sym: String, ex: String, price: String, time: String,
                    date: String, size: Double, comment1: String,comment2:String, comment3:String,
                    comment4: String,comment5:String, comment6:String,
-                   comment7: String,comment8:String, comment9:String) {
-
-//    def this(sym: String, ex: String, price: String, time: String,
-//             date: String, size: Double){
-//      this(sym, ex, price, time, date, size)
-//    }
-  }
+                   comment7: String,comment8:String, comment9:String)
 }

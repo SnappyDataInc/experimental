@@ -34,5 +34,5 @@ bin/snappy-job.sh submit  --lead localhost:8090  --app-name myapp --class org.ap
 
 Query the tables
 ```
-bin/snappy-job.sh submit  --lead localhost:8090  --app-name myapp --class org.apache.spark.examples.snappydata.QueryTradeAndQuoteJob --app-jar /home/hemant/repos/experimental/connectorExperiments/build/libs/connector-experiment-0.1.jar   --conf path=/home/hemant/repos/snappyData/build-artifacts/scala-2.11/snappy 
+bin/snappy-job.sh submit  --lead localhost:8090  --app-name myapp --class org.apache.spark.examples.snappydata.QueryTradeAndQuoteJob --app-jar /home/hemant/repos/experimental/connectorExperiments/build/libs/connector-experiment-0.1.jar 
 ```

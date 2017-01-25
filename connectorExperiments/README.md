@@ -17,12 +17,12 @@ Once the data is generated you can now use Spark Application or Snappy Jobs to i
 
 Create the tables. There are 2 parameters to this app (1) table type either row or column (2) path of the generated data. 
 ```
-bin/spark-submit --master=local[*]   --conf snappydata.store.locators=localhost:10334  --class=org.apache.spark.examples.snappydata.CreateTradeAndQuoteApp    --name=MyApp /home/hemant/repos/experimental/connectorExperiments/build/libs/connector-experiment-0.1.jar     column /home/hemant/repos/snappyData/build-artifacts/scala-2.11/snappy  
+bin/spark-submit --master=local[*]    --conf spark.snappydata.store.locators=localhost:10334   --class=org.apache.spark.examples.snappydata.CreateTradeAndQuoteApp --jars /home/hemant/repos/snappyData/build-artifacts/scala-2.11/distributions/snappydata-core_2.11-0.7.jar  --name=MyApp   /home/hemant/repos/experimental/connectorExperiments/build/libs/connector-experiment-0.1.jar  column /home/hemant/repos/snappyData/build-artifacts/scala-2.11/snappy
 ```
 
 Query the tables 
 ```
-bin/spark-submit --master=local[*]   --conf snappydata.store.locators=localhost:10334  --class=org.apache.spark.examples.snappydata.QueryTradeAndQuoteApp    --name=MyApp /home/hemant/repos/experimental/connectorExperiments/build/libs/connector-experiment-0.1.jar
+bin/spark-submit --master=local[*]   --conf spark.snappydata.store.locators=localhost:10334  --class=org.apache.spark.examples.snappydata.QueryTradeAndQuoteApp --jars /home/hemant/repos/snappyData/build-artifacts/scala-2.11/distributions/snappydata-core_2.11-0.7.jar    --name=MyApp /home/hemant/repos/experimental/connectorExperiments/build/libs/connector-experiment-0.1.jar
 ```
 
 #### Use Snappy jobs to create and query the tables

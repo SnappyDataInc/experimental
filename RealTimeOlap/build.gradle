@@ -15,86 +15,153 @@
  * LICENSE file.
  */
 plugins {
-  id 'java'
+    id 'java'
 }
 
 archivesBaseName = 'realtimeolap'
 
 allprojects {
 
-  version = '0.1'
+    version = '0.1'
 
-  repositories {
-    mavenCentral()
-    maven { url "https://oss.sonatype.org/content/groups/public" }
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-    maven { url "http://mvnrepository.com/artifact" }
-  }
-
-  apply plugin: 'java'
-  apply plugin: 'maven'
-  apply plugin: 'scala'
-  apply plugin: 'idea'
-  apply plugin: 'eclipse'
-
-  configurations {
-    provided {
-      description 'a dependency that is provided externally at runtime'
-      visible true
+    repositories {
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/groups/public" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "http://mvnrepository.com/artifact" }
     }
-  }
 
-  idea {
-    module {
-      scopes.PROVIDED.plus += [ configurations.provided ]
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'scala'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+
+    configurations {
+        provided {
+            description 'a dependency that is provided externally at runtime'
+            visible true
+        }
     }
-  }
-  eclipse {
-    classpath {
-      plusConfigurations += [ configurations.provided ]
+
+    idea {
+        module {
+            scopes.PROVIDED.plus += [configurations.provided]
+        }
     }
-  }
+    eclipse {
+        classpath {
+            plusConfigurations += [configurations.provided]
+        }
+    }
 
-  sourceSets {
-    main.compileClasspath += configurations.provided
-    main.runtimeClasspath -= configurations.provided
-    test.compileClasspath += configurations.provided
-    test.runtimeClasspath += configurations.provided
-  }
+    sourceSets {
+        main.compileClasspath += configurations.provided
+        main.runtimeClasspath -= configurations.provided
+        test.compileClasspath += configurations.provided
+        test.runtimeClasspath += configurations.provided
+    }
 
-  javadoc.classpath += configurations.provided
-  ext {
-    sparkVersion = '2.0.0'
-    snappyVersion = '0.8'
-  }
+    javadoc.classpath += configurations.provided
+    ext {
+        sparkVersion = '2.0.0'
+        snappyVersion = '0.8'
+        hiveVersion = '1.2.1.spark2'
+        thriftVersion = '0.9.3'
+        jettyVersion = '9.2.16.v20160414'
+        kryoVersion = '4.0.0'
+        snappyStoreVersion = '1.5.4'
+    }
 
-  configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 4, 'hours'
-  }
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 4, 'hours'
+    }
 
-  dependencies {
-    compile 'org.scala-lang:scala-library:2.11.6'
-    compile 'org.scala-lang:scala-reflect:2.11.6'
-    compile 'org.scala-lang:scala-compiler:2.11.6'
-  }
+    dependencies {
+        compile 'org.scala-lang:scala-library:2.11.6'
+        compile 'org.scala-lang:scala-reflect:2.11.6'
+        compile 'org.scala-lang:scala-compiler:2.11.6'
+    }
 }
 
 
 dependencies {
-  compile "io.snappydata:snappydata-core_2.11:${snappyVersion}"
-  // using Spark and not Snappy-Spark 
-  compile "org.apache.spark:spark-core_2.11:${sparkVersion}"
-  compile "org.apache.spark:spark-catalyst_2.11:${sparkVersion}"
-  compile "org.apache.spark:spark-sql_2.11:${sparkVersion}"
-  // compile group: 'com.datastax.cassandra', name: 'cassandra-driver-core', version: '3.1.0'
-  compile group: 'com.datastax.cassandra', name: 'cassandra-driver-core', version: '3.2.0'
-//  compile(group: 'org.apache.cassandra' , name: 'cassandra-all', version: '3.10') {
-//    exclude ("org.slf4j:log4j-over-slf4j")
-//  }
-  compile ("org.apache.cassandra:cassandra-all:3.10") {
-    exclude (group: 'org.slf4j', module: 'log4j-over-slf4j')
-  }
-  compile group: 'com.datastax.spark', name: 'spark-cassandra-connector_2.11', version: '2.0.1'
+    //compile files("/home/hemant/repos/snappyData/core/build-artifacts/scala-2.11/libs/snappydata-core_2.11-0.8.jar")
+    // using Spark and not Snappy-Spark
+    compile "org.apache.spark:spark-core_2.11:${sparkVersion}"
+    compile "org.apache.spark:spark-catalyst_2.11:${sparkVersion}"
+    compile "org.apache.spark:spark-sql_2.11:${sparkVersion}"
+    compile "org.apache.spark:spark-hive_2.11:${sparkVersion}"
+    compile group: 'com.datastax.cassandra', name: 'cassandra-driver-core', version: '3.2.0'
+    compile("org.apache.cassandra:cassandra-all:3.10") {
+        exclude(group: 'org.slf4j', module: 'log4j-over-slf4j')
+    }
+    compile group: 'com.datastax.spark', name: 'spark-cassandra-connector_2.11', version: '2.0.1'
+    compile(group: 'org.spark-project.hive', name: 'hive-metastore', version: hiveVersion) {
+        exclude(group: 'org.spark-project.hive', module: 'hive-serde')
+        exclude(group: 'org.spark-project.hive', module: 'hive-shims')
+        exclude(group: 'org.apache.thrift', module: 'libfb303')
+        exclude(group: 'org.apache.thrift', module: 'libthrift')
+        exclude(group: 'javax.servlet', module: 'servlet-api')
+        exclude(group: 'com.google.guava', module: 'guava')
+        exclude(group: 'org.slf4j', module: 'slf4j-api')
+        exclude(group: 'org.slf4j', module: 'slf4j-log4j12')
+        exclude(group: 'org.apache.derby', module: 'derby')
+    }
+    compile(group: 'org.spark-project.hive', name: 'hive-exec', version: hiveVersion) {
+        exclude(group: 'org.spark-project.hive', module: 'hive-metastore')
+        exclude(group: 'org.spark-project.hive', module: 'hive-shims')
+        exclude(group: 'org.spark-project.hive', module: 'hive-ant')
+        exclude(group: 'org.spark-project.hive', module: 'spark-client')
+        exclude(group: 'org.apache.ant', module: 'ant')
+        exclude(group: 'com.esotericsoftware.kryo', module: 'kryo')
+        exclude(group: 'commons-codec', module: 'commons-codec')
+        exclude(group: 'commons-httpclient', module: 'commons-httpclient')
+        exclude(group: 'org.apache.avro', module: 'avro-mapred')
+        exclude(group: 'org.apache.calcite', module: 'calcite-core')
+        exclude(group: 'org.apache.curator', module: 'apache-curator')
+        exclude(group: 'org.apache.curator', module: 'curator-client')
+        exclude(group: 'org.apache.curator', module: 'curator-framework')
+        exclude(group: 'org.apache.thrift', module: 'libthrift')
+        exclude(group: 'org.apache.thrift', module: 'libfb303')
+        exclude(group: 'org.apache.zookeeper', module: 'zookeeper')
+        exclude(group: 'org.slf4j', module: 'slf4j-api')
+        exclude(group: 'org.slf4j', module: 'slf4j-log4j12')
+        exclude(group: 'log4j', module: 'log4j')
+        exclude(group: 'commons-logging', module: 'commons-logging')
+        exclude(group: 'org.codehaus.groovy', module: 'groovy-all')
+        exclude(group: 'jline', module: 'jline')
+    }
+
+    compile(group: 'org.apache.thrift', name: 'libfb303', version: thriftVersion) {
+        exclude(group: 'org.slf4j', module: 'slf4j-api')
+    }
+
+
+    compile "org.eclipse.jetty:jetty-servlet:${jettyVersion}"
+//  compile files("/home/hemant/repos/snappyData/build-artifacts/scala-2.11/snappy/jars/snappydata-store-client-1.5.4.jar")
+//  compile files("/home/hemant/repos/snappyData/build-artifacts/scala-2.11/snappy/jars/snappydata-store-core-1.5.4.jar")
+//  compile files("/home/hemant/repos/snappyData/store/gemfire-core/build-artifacts/linux/libs/gemfire-core-1.5.4.jar")
+//  compile files("/home/hemant/repos/snappyData/build-artifacts/scala-2.11/snappy/jars/snappydata-store-tools-1.5.4.jar")
+//  compile files("/home/hemant/repos/snappyData/store/gemfire-shared/build-artifacts/linux/libs/gemfire-shared-1.5.4.jar")
+//  compile files("/home/hemant/repos/snappyData/store/lgpl/gemfire-trove/build-artifacts/linux/libs/gemfire-trove-1.5.4.jar")
+    compile files("/home/hemant/repos/snappyData/build-artifacts/scala-2.11/distributions/snappydata-client-1.5.4.jar")
+    compile files("/home/hemant/repos/snappyData/build-artifacts/scala-2.11/distributions/snappydata-core_2.11-0.8.jar")
+
+    compile("org.parboiled:parboiled_2.11:2.1.3") {
+        exclude(group: 'org.scala-lang', module: 'scala-library')
+        exclude(group: 'org.scala-lang', module: 'scala-reflect')
+        exclude(group: 'org.scala-lang', module: 'scala-compiler')
+    }
+    compile 'org.apache.tomcat:tomcat-jdbc:8.5.9'
+    compile 'com.zaxxer:HikariCP:2.6.0'
+    // compile 'org.spark-project:dstream-twitter_2.11:0.1.0'
+    compile 'org.twitter4j:twitter4j-stream:4.0.4'
+    compile 'org.objenesis:objenesis:2.4'
+    compile "com.esotericsoftware:kryo-shaded:${kryoVersion}"
+    compile 'com.rabbitmq:amqp-client:3.5.7'
+    compile group: 'org.codehaus.janino', name: 'janino', version: '3.0.6'
+    compile "org.apache.thrift:libthrift:${thriftVersion}"
 
 }
 

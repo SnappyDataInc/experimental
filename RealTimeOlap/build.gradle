@@ -87,7 +87,6 @@ allprojects {
 String snappyInstallDir = System.getenv('SNAPPY_HOME')
 if (snappyInstallDir == null || snappyInstallDir == '')
   snappyInstallDir = "/home/hemant/repos/snappyData/build-artifacts/scala-2.11/snappy"
-
 dependencies {
     // using Spark and not Snappy-Spark
     compile ("org.apache.spark:spark-core_2.11:${sparkVersion}")
@@ -142,17 +141,17 @@ dependencies {
 
     compile "org.eclipse.jetty:jetty-servlet:${jettyVersion}"
     compile files("${snappyInstallDir}/jars/snappydata-core_2.11-0.8.jar")
-    compile files("${snappyInstallDir}/jars/snappydata-store-client-1.5.4.jar")
-    compile files("${snappyInstallDir}/jars/snappydata-store-shared-1.5.4.jar")
+    compile files("${snappyInstallDir}/jars/snappydata-store-client-${snappyStoreVersion}.jar")
+    compile files("${snappyInstallDir}/jars/snappydata-store-shared-${snappyStoreVersion}.jar")
     compile files("${snappyInstallDir}/jars/snappy-spark-hive_2.11-2.0.2.3.jar")
     compile files("${snappyInstallDir}/jars/snappy-spark-unsafe_2.11-2.0.2.3.jar")
-    compile files("${snappyInstallDir}/jars/snappydata-store-tools-1.5.4.jar")
-    compile files("${snappyInstallDir}/jars/snappydata-store-core-1.5.4.jar")
+    compile files("${snappyInstallDir}/jars/snappydata-store-tools-${snappyStoreVersion}.jar")
+    compile files("${snappyInstallDir}/jars/snappydata-store-core-${snappyStoreVersion}.jar")
     compile files("${snappyInstallDir}/jars/snappy-spark-streaming_2.11-2.0.2.3.jar")
-    compile files("${snappyInstallDir}/jars/gemfire-core-1.5.4.jar")
-    compile files("${snappyInstallDir}/jars/gemfire-shared-1.5.4.jar")
-    compile files("${snappyInstallDir}/jars/gemfire-trove-1.5.4.jar")
-   compile files("${snappyInstallDir}/jars/gemfire-jgroups-1.5.4.jar")
+    compile files("${snappyInstallDir}/jars/gemfire-core-${snappyStoreVersion}.jar")
+    compile files("${snappyInstallDir}/jars/gemfire-shared-${snappyStoreVersion}.jar")
+    compile files("${snappyInstallDir}/jars/gemfire-trove-${snappyStoreVersion}.jar")
+   compile files("${snappyInstallDir}/jars/gemfire-jgroups-${snappyStoreVersion}.jar")
 
     compile("org.parboiled:parboiled_2.11:2.1.3") {
         exclude(group: 'org.scala-lang', module: 'scala-library')

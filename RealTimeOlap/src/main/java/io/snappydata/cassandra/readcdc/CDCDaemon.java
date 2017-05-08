@@ -29,7 +29,7 @@ public class CDCDaemon
     private final Path commitlogDirectory = Paths.get("/home/hemant/install/apache-cassandra-3.10/data/commitlog");
     private final Path cdcRawDirectory = Paths.get("/home/hemant/install/apache-cassandra-3.10/data/cdc_raw");
     private final CDCHandler handler = new SimpleCount(); //new LogHandler1();
-    private final Set<UUID> unknownCfids = Sets.newConcurrentHashSet();
+    private final Set<UUID> unknownCfids = Sets.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
 
     private CDCDaemon()
     {

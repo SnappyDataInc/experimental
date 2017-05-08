@@ -10,33 +10,38 @@ import org.apache.spark.sql.{SnappySession, SparkSession}
 object CassandraSparkOps {
   def main(args: Array[String]) {
 
+    if (args.length != 5){
+      println("CassandraSparkOps cassandrahost snappydataclusterurl keyspace tableName partitionnByColumn")
+      println ("CassandraSparkOps localhost localhost:1527 mykeyspace mytable colName")
+      return
+    }
     val spark: SparkSession = SparkSession
       .builder
-      .appName("CollocatedJoinExample")
+      .appName("CassandraSparkOps")
       .master("local[*]")
-      .config("spark.cassandra.connection.host", "localhost")
-      .config("snappydata.Cluster.URL", "localhost:1527")
+      .config("spark.cassandra.connection.host", args(0))
+      .config("snappydata.Cluster.URL", args(1))
       // sys-disk-dir attribute specifies the directory where persistent data is saved
       .getOrCreate
     val snSession = new SnappySession(spark.sparkContext)
     val sc = spark.sparkContext
     import com.datastax.spark.connector._ //Loads implicit functions
-    val df = sc.cassandraTable("initkey", "foo1")
 
     val df1 = snSession
       .read
       .format("org.apache.spark.sql.cassandra")
-      .options(Map( "table" -> "foo1", "keyspace" -> "initkey" ))
+      .options(Map( "table" -> args(3), "keyspace" -> args(2) ))
       .load()
     df1.show()
     df1.printSchema()
 
-    snSession.dropTable("foo1_snappy", true);
+    val snappyTbl =s"snappy_${args(3)}"
+    snSession.dropTable(snappyTbl, true);
 
-    snSession.createTable("foo1_snappy", "column", df1.schema, Map("PARTITION_BY" -> "a"), true)
+    snSession.createTable(snappyTbl, "column", df1.schema, Map("PARTITION_BY" -> args(4)), true)
     // Thread.sleep(100000)
-    df1.write.insertInto("foo1_snappy")
-    snSession.sql("select * from foo1_snappy ").show
+    df1.write.insertInto(snappyTbl)
+    snSession.sql(s"select * from $snappyTbl").show
 
     Thread.sleep(1000000)
 

@@ -36,7 +36,8 @@ localhost -spark.cassandra.connection.host=localhost -classpath=/home/hemant/.gr
 conf/servers - Specify the cassandra jars 
 ```
 localhost -classpath=/home/hemant/.gradle/caches/modules-2/files-2.1/com.datastax.spark/spark-cassandra-connector_2.11/2.0.1/20f57d120023d21b802429dc58131090e5d199ee/spark-cassandra-connector_2.11-2.0.1.jar:/home/hemant/.gradle/caches/modules-2/files-2.1/org.apache.cassandra/cassandra-all/3.10/78dcef53ddff978613b0f864c3a73ddd61a34535/cassandra-all-3.10.jar:/home/hemant/.gradle/caches/modules-2/files-2.1/com.datastax.cassandra/cassandra-driver-core/3.2.0/65ffab45202c0830a37140dbc22c021b8a269c0/cassandra-driver-core-3.2.0.jar:/home/hemant/.gradle/caches/modules-2/files-2.1/org.apache.cassandra/cassandra-thrift/3.10/8ebd08d5a479420aefe1e17754cc2fb64484c39b/cassandra-thrift-3.10.jar
-{code }
+```
+
 Start the snappy leads and servers 
 #### Create Cassandra's table as an external table
 ```

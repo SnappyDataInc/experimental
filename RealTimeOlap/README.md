@@ -3,7 +3,9 @@ Use the following command to build this application:
  
 $./gradlew clean build 
 
-To test this application:
+## BULK LOAD FROM CASSANDRA  INTO SNAPPY 
+
+You can use CassandraSparkOps application in this project. But, an easier approach would be by creating an external table that is mentioned here: 
 
 #### Start a cassandra server
 ```
@@ -22,7 +24,7 @@ CREATE KEYSPACE initkey WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replic
 #### Create a table in cassandra
 ```
 bin/cqlsh> use initkey;
-bin/cqlsh:initkey>CREATE TABLE airline (Year int,Month int,DayOfMonth int,DayOfWeek int,DepTime int,CRSDepTime int, ArrTime int,CRSArrTime int, UniqueCarrier text ,FlightNum int,TailNum text,ActualElapsedTime int, CRSElapsedTime int,AirTime int,ArrDelay int,DepDelay int,Origin text,Dest text,Distance int ,TaxiIn int, TaxiOut  int,Cancelled int ,CancellationCode  text,Diverted int ,CarrierDelay int , WeatherDelay int,NASDelay int,SecurityDelay int,LateAircraftDelay int, ArrDelaySlot int, Primary Key(Year,Month,DayOfMonth,DepTime,UniqueCarrier)) WITH cdc=true;
+bin/cqlsh:initkey>CREATE TABLE airline (Year int,Month int,DayOfMonth int,DayOfWeek int,DepTime int,CRSDepTime int, ArrTime int,CRSArrTime int, UniqueCarrier text ,FlightNum int,TailNum text,ActualElapsedTime int, CRSElapsedTime int,AirTime int,ArrDelay int,DepDelay int,Origin text,Dest text,Distance int ,TaxiIn int, TaxiOut  int,Cancelled int ,CancellationCode  text,Diverted int ,CarrierDelay int , WeatherDelay int,NASDelay int,SecurityDelay int,LateAircraftDelay int, ArrDelaySlot int, Primary Key(Year,Month,DayOfMonth,DepTime, FlightNum, Origin, Dest ,UniqueCarrier)) WITH cdc=true;
 ```
 #### Import the csv data into Cassandra's table using Cassandra's copy utility
 ```

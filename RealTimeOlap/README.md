@@ -24,11 +24,14 @@ CREATE KEYSPACE initkey WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replic
 #### Create a table in cassandra
 ```
 bin/cqlsh> use initkey;
-bin/cqlsh:initkey>CREATE TABLE airline (Year int,Month int,DayOfMonth int,DayOfWeek int,DepTime int,CRSDepTime int, ArrTime int,CRSArrTime int, UniqueCarrier text ,FlightNum int,TailNum text,ActualElapsedTime int, CRSElapsedTime int,AirTime int,ArrDelay int,DepDelay int,Origin text,Dest text,Distance int ,TaxiIn int, TaxiOut  int,Cancelled int ,CancellationCode  text,Diverted int ,CarrierDelay int , WeatherDelay int,NASDelay int,SecurityDelay int,LateAircraftDelay int, ArrDelaySlot int, Primary Key(Year,Month,DayOfMonth,DepTime, FlightNum, Origin, Dest ,UniqueCarrier)) WITH cdc=true;
+bin/cqlsh:initkey>CREATE TABLE airline (Year int,Month int,DayOfMonth int,DayOfWeek int,DepTime int,CRSDepTime int, ArrTime int,CRSArrTime int, UniqueCarrier text ,FlightNum int,TailNum text,ActualElapsedTime int, CRSElapsedTime int,AirTime int,ArrDelay int,DepDelay int,Origin text,Dest text,Distance int ,TaxiIn int, TaxiOut  int,Cancelled int ,CancellationCode  text,Diverted int ,CarrierDelay int , WeatherDelay int,NASDelay int,SecurityDelay int,LateAircraftDelay int, ArrDelaySlot int, Primary Key(Year,Month,DayOfMonth,DepTime, FlightNum, Origin, Dest ,UniqueCarrier)) 
+WITH cdc=true;
 ```
 #### Import the csv data into Cassandra's table using Cassandra's copy utility
 ```
-bin/cqlsh:initkey> copy airline (Year ,Month ,DayOfMonth ,DayOfWeek ,DepTime ,CRSDepTime , ArrTime ,CRSArrTime , UniqueCarrier ,FlightNum ,TailNum ,ActualElapsedTime , CRSElapsedTime ,AirTime ,ArrDelay ,DepDelay ,Origin ,Dest ,Distance ,TaxiIn , TaxiOut  ,Cancelled ,CancellationCode  ,Diverted ,CarrierDelay , WeatherDelay ,NASDelay ,SecurityDelay ,LateAircraftDelay , ArrDelaySlot)  from '/nfs/users/hemant/data/airline.csv' with HEADER=TRUE 
+bin/cqlsh:initkey> copy airline (Year ,Month ,DayOfMonth ,DayOfWeek ,DepTime ,CRSDepTime , ArrTime ,CRSArrTime , UniqueCarrier ,FlightNum ,TailNum ,ActualElapsedTime , CRSElapsedTime ,AirTime ,ArrDelay ,DepDelay ,Origin ,Dest ,Distance ,TaxiIn , TaxiOut  ,Cancelled ,CancellationCode  ,Diverted ,CarrierDelay , WeatherDelay ,NASDelay ,SecurityDelay ,LateAircraftDelay , ArrDelaySlot)  
+from '/nfs/users/hemant/data/airline.csv' 
+with HEADER=TRUE 
 ```
 #### Create the conf/leads and conf/servers with the following jars as the classpath 
 conf/leads - Specify the cassandra host and the jars 

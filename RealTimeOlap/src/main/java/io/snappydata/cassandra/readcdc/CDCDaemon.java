@@ -1,15 +1,21 @@
 package io.snappydata.cassandra.readcdc;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import com.gemstone.gemfire.management.internal.SystemManagementService;
 import com.google.common.collect.Sets;
 
 import com.datastax.driver.core.Cluster;
@@ -19,26 +25,68 @@ import org.apache.cassandra.db.commitlog.CommitLogDescriptor;
 import org.apache.cassandra.db.commitlog.CommitLogPosition;
 import org.apache.cassandra.db.commitlog.CommitLogReadHandler;
 import org.apache.cassandra.db.commitlog.CommitLogReader;
+import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.db.partitions.PartitionUpdate;
 import org.apache.cassandra.db.rows.Row;
+import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class CDCDaemon
 {
     public static final String SCHEMA_NAME = "system_schema";
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
     private final Path commitlogDirectory = Paths.get("/home/hemant/install/apache-cassandra-3.10/data/commitlog");
-    private final Path cdcRawDirectory = Paths.get("/home/hemant/install/apache-cassandra-3.10/data/cdc_raw");
-    private final CDCHandler handler = new SimpleCount(); //new LogHandler1();
+    private final Path cdcRawDirectory;
+    private final CDCHandler handler = new PushToSnappy(); //new LogHandler1();
     private final Set<UUID> unknownCfids = Sets.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
+    private final String cass_keyspace;
+    private final String cass_table;
+    private Connection conn;
 
-    private CDCDaemon()
+    private CDCDaemon(String[] args)
     {
+        this.cass_table = args[2];
+        this.cass_keyspace = args[1];
+        cdcRawDirectory = Paths.get(args[0]);
+        String snappyconn = "";
+        if (args.length == 4) {
+            snappyconn = args[3];
+        } else if (args.length == 3) {
+            snappyconn = "localhost:1527";
+        } else {
+            System.out.println("CDCDaemon cdcDirectoryPath KeySpace tableName snappyClientConn");
+            return;
+        }
+
+        conn = getConnection("jdbc:snappydata://" + snappyconn + "/host-data=false;");
+
         Config.setClientMode(true);
+    }
+
+    public Connection getConnection(String url) {
+        Connection con = null;
+        String driver = "io.snappydata.jdbc.ClientDriver";
+        try {
+            Class.forName(driver);
+        } catch (java.lang.ClassNotFoundException e) {
+            System.err.print("ClassNotFoundException: ");
+            System.err.println(e.getMessage());
+            System.exit(3);
+        }
+
+        try {
+            con = DriverManager.getConnection(url);
+        } catch (SQLException ex) {
+            System.err.println("SQLException: " + ex.getMessage());
+            System.exit(3);
+        }
+
+        return con;
     }
 
     public static void main(String[] args)
     {
-        new CDCDaemon().start();
+        new CDCDaemon(args).start();
     }
 
     private void tryRead(Path p, boolean canDelete, boolean canReload)
@@ -170,52 +218,8 @@ public class CDCDaemon
     {
         CommitLogPosition getPosition(long identifier);
     }
-    public class LogHandler1 implements CDCHandler
-    {
-        public List<Mutation> seenMutations = new ArrayList<Mutation>();
-        public boolean sawStopOnErrorCheck = false;
 
-        private final CFMetaData cfm;
-        @Override
-        public CommitLogPosition getPosition(long identifier)
-        {
-            return CommitLogPosition.NONE;
-        }
-        // Accept all
-        public LogHandler1()
-        {
-            this.cfm = null;
-        }
-
-        public LogHandler1(CFMetaData cfm)
-        {
-            this.cfm = cfm;
-        }
-
-        public boolean shouldSkipSegmentOnError(CommitLogReadException exception) throws IOException
-        {
-            sawStopOnErrorCheck = true;
-            return false;
-        }
-
-        public void handleUnrecoverableError(CommitLogReadException exception) throws IOException
-        {
-            sawStopOnErrorCheck = true;
-        }
-
-        public void handleMutation(Mutation m, int size, int entryLocation, CommitLogDescriptor desc)
-        {
-            count++;
-            if (!m.getKeyspaceName().startsWith("system")) {
-                System.out.println("Mutation " + m.toString(true));
-                seenMutations.add(m);
-            }
-        }
-        public int count = 0;
-        public int seenMutationCount() { return seenMutations.size(); }
-    }
-
-    private static class SimpleCount implements CDCHandler
+    private class PushToSnappy implements CDCHandler
     {
         private final Map<Long, Integer> furthestPosition = new HashMap<>();
 
@@ -249,25 +253,83 @@ public class CDCDaemon
 //                    System.out.println("reading mutation " + m.toString(true));
                 String keyspace = m.getKeyspaceName();
                 Collection<UUID> modifications = m.getColumnFamilyIds();
+
                 List<String> cfnames = new ArrayList<>(modifications.size());
                 for (UUID cfid : modifications)
                 {
                     CFMetaData cfm = Schema.instance.getCFMetaData(cfid);
                     PartitionUpdate partitionUpdate = m.getPartitionUpdate(cfid);
                     for (Row row: partitionUpdate) {
-                        System.out.println("Starting a row update");
+                        String cols = "";
+                        String colValues = "";
+
                         for (ColumnDefinition cd : row.columns()) {
                             if (cd.isComplex()) {
                                 System.out.println("For key space " + keyspace + " for table name " + cfm.cfName
                                         + " for column " + cd.name.toCQLString()
                                         + " value " + row.getComplexColumnData(cd).toString());
                             } else {
-                                System.out.println("For key space " + keyspace + " for table name " + cfm.cfName
-                                        + " for column " + cd.name.toCQLString()
-                                        + " value " + cd.cellValueType().compose(row.getCell(cd).value()));
+                                if (keyspace.equalsIgnoreCase(cass_keyspace) && cfm.cfName.equalsIgnoreCase(cass_table)) {
+                                    cols += ("," + cd.name.toCQLString() );
+                                    if (cd.cellValueType() instanceof UTF8Type) {
+                                        colValues += (",'" + cd.cellValueType().compose(row.getCell(cd).value()) + "'") ;
+                                    } else {
+                                        colValues += ("," + cd.cellValueType().compose(row.getCell(cd).value()));
+                                    }
+
+
+                                } else {
+                                    System.out.println("For key space " + keyspace + " for table name " + cfm.cfName
+                                            + " for column " + cd.name.toCQLString()
+                                            + " value " + cd.cellValueType().compose(row.getCell(cd).value()));
+                                }
+
                             }
                         }
-                        System.out.println("Ending a row update");
+                        List<ColumnDefinition> partCols = cfm.partitionKeyColumns();
+                        for (ColumnDefinition cd: partCols)
+                        {
+                            if (keyspace.equalsIgnoreCase(cass_keyspace) && cfm.cfName.equalsIgnoreCase(cass_table)) {
+
+                                cols += ("," + cd.name.toCQLString() );
+                                if (cd.type instanceof UTF8Type) {
+                                    Object s  = cd.type.compose(partitionUpdate.partitionKey().getKey());
+                                    colValues += (", '" + s + "'");
+                                } else if (cd.type instanceof Int32Type) {
+                                    colValues += (", " + cd.type.compose(partitionUpdate.partitionKey().getKey()));
+                                }
+                            }
+                        }
+
+                        List<ColumnDefinition> clustCols = cfm.clusteringColumns();
+
+                        for (int i = 0; i < clustCols.size(); i++)
+                        {
+                            if (keyspace.equalsIgnoreCase(cass_keyspace) && cfm.cfName.equalsIgnoreCase(cass_table)) {
+
+                                ColumnDefinition c = clustCols.get(i);
+                                cols += ("," + c.name.toCQLString() );
+                                if (c.type instanceof UTF8Type) {
+                                    Object s  = c.type.compose(row.clustering().getRawValues()[i]);
+                                    colValues += (", '" + s + "'");
+                                } else if (c.type instanceof Int32Type) {
+                                    colValues += (", " + c.type.compose(row.clustering().getRawValues()[i]));
+                                }
+                            }
+                        }
+
+                        if (!cols.isEmpty()) {
+                            String insertstmt = "Insert into snappy_" + cass_table + " (" +
+                                    cols.substring(1) + ") values ( " + colValues.substring(1) + ");";
+                            try {
+                                System.out.println("Inserting row " + insertstmt);
+                                conn.createStatement().execute(insertstmt);
+                            } catch (SQLException e) {
+                                System.err.print("Cannot execute the statement " + insertstmt);
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
                 }
                 System.out.println("Newer: reading mutation " + m.toString(true));

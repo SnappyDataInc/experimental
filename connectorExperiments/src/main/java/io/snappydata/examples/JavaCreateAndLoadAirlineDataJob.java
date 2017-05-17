@@ -87,7 +87,7 @@ public class JavaCreateAndLoadAirlineDataJob extends JavaSnappySQLJob {
       		+ "WHERE airline.UniqueCarrier = airlineref.CODE AND  "
       		+ "Origin like '%SFO%' AND "
       		+ "WeatherDelay > 0 "
-      		+ "GROUP BY DESCRIPTION limit 0").collect();
+      		+ "GROUP BY DESCRIPTION limit 20").collect();
       
       for(Row row: result) {
     	  pw.println(row);

@@ -279,9 +279,9 @@ public class CDCDaemon
 
 
                                 } else {
-                                    System.out.println("For key space " + keyspace + " for table name " + cfm.cfName
-                                            + " for column " + cd.name.toCQLString()
-                                            + " value " + cd.cellValueType().compose(row.getCell(cd).value()));
+//                                        System.out.println("For key space " + keyspace + " for table name " + cfm.cfName
+//                                                + " for column " + cd.name.toCQLString()
+//                                                + " value " + cd.cellValueType().compose(row.getCell(cd).value()));
                                 }
 
                             }

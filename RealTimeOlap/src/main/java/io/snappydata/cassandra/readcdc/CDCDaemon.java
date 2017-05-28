@@ -180,12 +180,12 @@ public class CDCDaemon
 
     private void iteration()
     {
-        Future<?> overflow = executor.submit(this::readRaw);
-        // Future<?> current = executor.submit(this::readCurrent);
+        //Future<?> overflow = executor.submit(this::readRaw);
+        Future<?> current = executor.submit(this::readCurrent);
         try
         {
-            overflow.get();
-            // current.get();
+            // overflow.get();
+            current.get();
         }
         catch (InterruptedException | ExecutionException e)
         {
@@ -239,7 +239,7 @@ public class CDCDaemon
         @Override
         public void handleMutation(Mutation m, int size, int entryLocation, CommitLogDescriptor desc)
         {
-            System.out.println("All: reading mutation " + m.toString(true));
+            // System.out.println("All: reading mutation " + m.toString(true));
             if (furthestPosition.getOrDefault(desc.id, 0) < entryLocation)
             {
 //                boolean cdc = false;
@@ -322,7 +322,7 @@ public class CDCDaemon
                             String insertstmt = "Insert into snappy_" + cass_table + " (" +
                                     cols.substring(1) + ") values ( " + colValues.substring(1) + ");";
                             try {
-                                System.out.println("Inserting row " + insertstmt);
+                                // System.out.println("Inserting row " + insertstmt);
                                 conn.createStatement().execute(insertstmt);
                             } catch (SQLException e) {
                                 System.err.print("Cannot execute the statement " + insertstmt);
@@ -332,7 +332,7 @@ public class CDCDaemon
 
                     }
                 }
-                System.out.println("Newer: reading mutation " + m.toString(true));
+                // System.out.println("Newer: reading mutation " + m.toString(true));
                 furthestPosition.put(desc.id, entryLocation);
             }
         }

@@ -35,8 +35,8 @@ public class CDCDaemon
 {
     public static final String SCHEMA_NAME = "system_schema";
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
-    private final Path commitlogDirectory = Paths.get("/home/hemant/install/apache-cassandra-3.10/data/commitlog");
-    private final Path cdcRawDirectory;
+    private final Path commitlogDirectory;
+    private final Path cdcRawDirectory = Paths.get("/home/hemant/install/apache-cassandra-3.10/data/cdc_raw");
     private final CDCHandler handler = new PushToSnappy(); //new LogHandler1();
     private final Set<UUID> unknownCfids = Sets.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
     private final String cass_keyspace;
@@ -47,14 +47,14 @@ public class CDCDaemon
     {
         this.cass_table = args[2];
         this.cass_keyspace = args[1];
-        cdcRawDirectory = Paths.get(args[0]);
+        commitlogDirectory = Paths.get(args[0]);
         String snappyconn = "";
         if (args.length == 4) {
             snappyconn = args[3];
         } else if (args.length == 3) {
             snappyconn = "localhost:1527";
         } else {
-            System.out.println("CDCDaemon cdcDirectoryPath KeySpace tableName snappyClientConn");
+            System.out.println("CDCDaemon directoryPath KeySpace tableName snappyClientConn");
             return;
         }
 

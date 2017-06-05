@@ -1,0 +1,44 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+
+archivesBaseName = 'cassandra-cdc'
+
+dependencies {
+  compile rootProject
+  compile project(':RealTimeOlap')
+}
+
+shadowJar {
+  zip64 true
+  mergeServiceFiles {
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+  }
+  classifier = 'assembly'
+
+  // exclude dependencies available in snappydata assembly jar
+  // else version conflicts can cause problems
+  dependencies {
+    exclude dependency('org.scala-lang:scala-library:.*')
+    exclude dependency('org.scala-lang:scala-reflect:.*')
+    exclude dependency('org.scala-lang:scala-compiler:.*')
+  }
+
+  def createdBy = ""
+  if (rootProject.hasProperty('enablePublish')) {
+    createdBy = "SnappyData Build Team"
+  } else {
+    createdBy = System.getProperty("user.name")
+  }
+  manifest {
+    attributes(
+      "Manifest-Version"  : "1.0",
+      "Created-By"        : createdBy,
+      "Title"             : rootProject.name,
+      "Version"           : version,
+      "Vendor"            : "SnappyData, Inc."
+    )
+  }
+}
+
+jar.dependsOn shadowJar

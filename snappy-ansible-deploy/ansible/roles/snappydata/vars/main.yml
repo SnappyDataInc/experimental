@@ -1,0 +1,24 @@
+---
+java_download_url: http://download.oracle.com/otn/java/jdk/8u171-b11/512cd62ec5174c3487ac17c61aaa89e8/jdk-8u171-linux-x64.tar.gz
+java_download_folder: /opt
+java_name: "{{java_download_folder}}/jdk1.8.0_171"
+java_tarball: "/opt/ansible/roles/snappydata/files/jdk-8u171-linux-x64.tar.gz"
+java_tarball_folder_name: "/opt/jdk-8u171-linux-x64.tar.gz"
+java_archive: "{{java_download_folder}}/jdk-8u171-linux-x64.tar.gz"
+java_symlink: "{{java_download_folder}}/Java"
+
+tarball_extension: ".tar.gz"
+
+snappy_version: TIB_compute_1.1.0_linux
+snappy_download_folder: /opt
+snappy_name: "{{snappy_download_folder}}/{{snappy_version}}"
+snappy_tarball: "/opt/ansible/roles/snappydata/files/{{snappy_version}}{{tarball_extension}}"
+snappy_archive: "{{snappy_download_folder}}/{{snappy_version}}{{tarball_extension}}"
+snappy_symlink: "{{snappy_download_folder}}/snappydata"
+snappy_bin: "{{snappy_symlink}}/bin"
+snappy_sbin: "{{snappy_symlink}}/sbin"
+snappy_conf: "{{snappy_symlink}}/conf"
+snappy_jars: "{{snappy_symlink}}/jars"
+
+local_file_path: "/opt/ansible/roles/snappydata/files"
+

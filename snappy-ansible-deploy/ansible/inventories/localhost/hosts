@@ -1,0 +1,15 @@
+[control]
+localhost ansible-connection=local
+
+[snappydata]
+localhost
+
+[snappydata-leads]
+localhost
+
+[snappydata-locators]
+localhost
+
+[snappydata-servers]
+localhost
+

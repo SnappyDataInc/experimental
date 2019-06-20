@@ -1,0 +1,38 @@
+---
+- hosts: snappydata
+  tasks:
+
+# OS Cache Size
+# -------------
+# When there is a lot of disk activity especially during table joins and during an eviction, the process may experience GC pauses. 
+# To avoid such situations, it is recommended to reduce the OS cache size by specifying a lower dirty ratio and less expiry time of the dirty pages. 
+# The following are the typical configuration to be done on the machines that are running SnappyData processes.
+
+   - name: Update sysctl dirty background ratio setting
+     sysctl:
+         name: vm.dirty_background_ratio
+         value: 2
+     become: true
+     become_user: root
+      
+   - name: Update sysctl dirty ratio
+     sysctl:
+         name: vm.dirty_ratio
+         value: 4
+     become: true
+     become_user: root
+
+   - name: Update sysctl dirty expire
+     sysctl:
+        name: vm.dirty_expire_centisecs
+        value: 2000
+     become: true
+     become_user: root
+
+   - name: Update sysctl dirty writeback
+     sysctl:
+        name: vm.dirty_writeback_centisecs
+        value: 300
+     become: true
+     become_user: root
+

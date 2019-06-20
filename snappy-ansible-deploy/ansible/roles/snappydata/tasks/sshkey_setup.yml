@@ -1,0 +1,98 @@
+---
+- hosts: snappydata
+  tasks:
+
+   - name: include variables for snappydata role
+     include_vars:
+        file: /opt/ansible/roles/snappydata/vars/main.yml
+
+   - name: include variables for inventory
+     include_vars:
+        file: /opt/ansible/inventories/{{environment_name}}/group_vars/main.yml
+
+   - name: create snappydata user and rsa key
+     user:
+        name: snappydata
+        groups:
+        - snappydata
+        - wheel
+        generate_ssh_key: yes
+        state: present
+        shell: /bin/bash
+
+   - name: copy public key to new file
+     copy:
+        src: /home/snappydata/.ssh/id_rsa.pub
+        dest: "/home/snappydata/.ssh/{{inventory_hostname}}.pub"
+        remote_src: yes
+
+   - name: wipe out previous temp directory
+     file:
+        path: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys"
+        state: absent
+     delegate_to: localhost
+
+   - name: create dir to hold keys
+     file:
+        path: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys"
+        state: directory
+        owner: snappydata
+        group: snappydata
+        mode: 0777
+     delegate_to: localhost
+
+   - name: copy public key over to ansible server
+     fetch:
+        src: "/home/snappydata/.ssh/{{inventory_hostname}}.pub"
+        dest: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys/"
+        flat: yes
+
+   - name: update perms on copied files
+     file:
+        path: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys"
+        owner: snappydata
+        group: snappydata
+        mode: 0777
+        state: directory
+        recurse: yes
+     delegate_to: localhost
+
+   - name: delete masterkey.pub file
+     file:
+        path: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys/masterkey.pub"
+        state: absent
+     delegate_to: localhost
+
+   - name: create masterkey.pub file
+     file:
+        path: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys/masterkey.pub"
+        owner: snappydata
+        group: snappydata
+        mode: 0777
+        state: touch
+     delegate_to: localhost
+
+   - name: combine public keys into one file
+     assemble:
+        src: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys/"
+        dest: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys/masterkey.pub"
+     delegate_to: localhost
+
+   - name: create authorized_keys file
+     file:
+        path: "/home/snappydata/.ssh/authorized_keys"
+        owner: snappydata
+        group: snappydata
+        mode: 0644
+        state: touch
+       
+   - name: push master key file out to remote servers
+     copy:
+         src: "/opt/ansible/roles/snappydata/files/{{environment_name}}_keys/masterkey.pub"
+         dest: /home/snappydata/.ssh/authorized_keys
+         owner: snappydata
+         group: snappydata
+         mode: 0644
+         remote_src: no
+
+

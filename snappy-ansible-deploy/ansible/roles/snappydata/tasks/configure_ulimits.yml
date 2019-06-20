@@ -1,0 +1,66 @@
+---
+- hosts: snappydata
+  tasks:
+
+# These setting are from the SnappyData "Important Settings" page in the documentation. For best performance, the following operating system settings are recommended on the lead and server nodes.
+
+# Ulimit
+# ------- 
+# Spark and SnappyData spawn a number of threads and sockets for concurrent/parallel processing so the server and lead node machines may need to be configured for higher limits of open files and threads/processes. 
+#
+# A minimum of 8192 is recommended for open file descriptors limit and nproc limit to be greater than 128K. 
+# To change the limits of these settings for a user, the /etc/security/limits.conf file needs to be updated. A typical limits.conf used for SnappyData servers and leads looks like:
+
+   - name: Set nofile hard limit
+     pam_limits:
+       domain: snappydata
+       limit_type: hard
+       limit_item: nofile
+       value: 163840
+     become: true
+     become_user: root
+
+   - name: Set nofile soft limit
+     pam_limits:
+       domain: snappydata
+       limit_type: soft 
+       limit_item: nofile
+       value: 16384
+     become: true
+     become_user: root
+
+   - name: Set nproc hard limit
+     pam_limits:
+       domain: snappydata
+       limit_type: hard
+       limit_item: nproc
+       value: unlimited
+     become: true
+     become_user: root
+
+   - name: Set nproc soft limit
+     pam_limits:
+       domain: snappydata
+       limit_type: soft
+       limit_item: nproc
+       value: 524288  
+     become: true
+     become_user: root
+
+   - name: Set sigpending hard limit
+     pam_limits:
+       domain: snappydata
+       limit_type: hard
+       limit_item: sigpending 
+       value: unlimited 
+     become: true
+     become_user: root
+
+   - name: Set sigpending soft limit
+     pam_limits:
+       domain: snappydata
+       limit_type: soft 
+       limit_item: sigpending
+       value: 524288
+     become: true
+     become_user: root

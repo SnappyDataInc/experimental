@@ -1,0 +1,49 @@
+---
+- hosts: snappydata-servers
+  tasks:
+
+# Swap File
+# --------- 
+# Since modern operating systems perform lazy allocation, it has been observed that despite setting -Xmx and -Xms settings, at runtime, the operating system may fail to allocate new pages to the JVM. 
+# This can result in the process going down.
+# It is recommended to set swap space on your system using the following commands.
+
+
+   - name: Create swap directory
+     file: 
+      path: /snappydata_diskstore/swap
+      state: directory
+
+   - name: Set up a swap space of 32 GB
+     command: dd if=/dev/zero of=/snappydata_diskstore/swap/swapfile.snappy bs=1M count=32768
+     when: ansible_swaptotal_mb < 32768
+     become: true
+     become_user: root
+
+   - name: change permissions swap
+     command: chmod -R 600 /snappydata_diskstore/swap 
+     become: true
+     become_user: root
+
+   - name: change owner to root
+     command: chown -R root:root /snappydata_diskstore/swap 
+     become: true
+     become_user: root
+
+   - name: format file for swap
+     command: mkswap /snappydata_diskstore/swap/swapfile.snappy
+     when: ansible_swaptotal_mb < 32768
+     become: true
+     become_user: root
+
+   - name: add the file to the system as a swap file
+     command: swapon /snappydata_diskstore/swap/swapfile.snappy
+     when: ansible_swaptotal_mb < 32768 
+     become: true
+     become_user: root
+
+   - name: write swap entry in fstab
+     when: ansible_swaptotal_mb < 32768 
+     mount: name=none src=/snappydata_diskstore/swap/swapfile.snappy fstype=swap opts=sw passno=0 dump=0 state=present
+     become: true
+     become_user: root

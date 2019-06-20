@@ -1,0 +1,106 @@
+---
+- hosts: snappydata
+  tasks:
+
+   - name: include variables for snappydata role
+     include_vars:
+        file: /opt/ansible/roles/snappydata/vars/main.yml
+
+   - name: include variables for snappydata role
+     include_vars:
+        file: /opt/ansible/inventories/{{environment_name}}/group_vars/main.yml
+   
+   - name: create snappydata group
+     group: 
+        name: snappydata
+        state: present
+           
+   - name: Make sure we have a 'wheel' group
+     group:
+        name: wheel
+        state: present
+
+   - name: Allow 'wheel' group to have passwordless sudo
+     lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+   - name: create snappydata user and rsa key
+     user:
+        name: snappydata
+        groups:
+        - snappydata
+        - wheel
+        generate_ssh_key: yes
+        state: present
+        shell: /bin/bash
+
+  - name: create java dir
+     file:
+        path: "{{java_tarball_folder_name}}"
+        state: directory
+        
+   - name: copy and Unpack java
+     unarchive:
+        src: "{{java_tarball}}"
+        dest: "{{java_download_folder}}"
+        remote_src: no
+        owner: snappydata
+        group: snappydata
+
+   - name: Fix ownership
+     file: state=directory path={{java_name}} owner=root group=root recurse=yes
+
+   - name: Clean up
+     file: state=absent path={{java_archive}}
+
+   - name: create snappy dir
+     file:
+        path: "{{snappy_name}}"
+        state: directory
+
+   - name: copy and Unpack snappy
+     unarchive:
+        src: "{{snappy_tarball}}"
+        dest: "{{snappy_download_folder}}"
+        remote_src: no
+        owner: snappydata
+        group: snappydata
+
+   - name: Clean up
+     file: state=absent path={{snappy_archive}}
+
+   - name: create symlink to standardized working directories
+     file:
+         src: "{{snappy_name}}"
+         dest: "{{snappy_symlink}}"
+         state: link
+         group: snappydata
+         owner: snappydata
+
+   - name: create symlink to Java 
+     file:
+         src: "{{java_name}}"
+         dest: "{{java_symlink}}"
+         state: link
+         group: root
+         owner: root
+
+   - name: update JAVA_HOME
+     lineinfile:
+         dest: /etc/environment
+         state: present
+         regexp: '^JAVA_HOME'
+         line: 'JAVA_HOME={{java_symlink}}'
+
+
+   - name: update PATH with java and snappy
+     lineinfile:
+         dest: /etc/environment
+         state: present
+         regexp: '^PATH'
+         line: 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:{{snappy_symlink}}:{{snappy_bin}}:{{snappy_sbin}}:$JAVA_HOME:$JAVA_HOME/bin"'
+
